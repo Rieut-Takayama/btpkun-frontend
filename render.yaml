@@ -10,7 +10,7 @@ services:
         value: production
 
   # フロントエンドサービス（静的サイトのプレースホルダー）
-  - type: static
+  - type: static_site
     name: btpkun
     buildCommand: echo "Building static placeholder"
     staticPublishPath: ./

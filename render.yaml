@@ -3,17 +3,11 @@ services:
   - type: web
     name: btpkun-backend
     env: node
-    buildCommand: echo "No backend code yet"
-    startCommand: echo "This is a placeholder service"
+    rootDir: backend  # backendディレクトリを指定
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-
-  # フロントエンドサービス
-  - type: static
-    name: btpkun
-    buildCommand: echo "Building static placeholder"
-    staticPublishPath: ./
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://btpkun-backend.onrender.com
+      - key: PORT
+        value: 4000

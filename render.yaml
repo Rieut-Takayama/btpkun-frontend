@@ -3,8 +3,8 @@ services:
   - type: web
     name: btpkun-backend
     env: node
-    buildCommand: npm install  # 「cd backend &&」を削除
-    startCommand: npm start  # 「cd backend &&」を削除
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -17,8 +17,8 @@ services:
   - type: web
     name: btpkun
     env: static
-    buildCommand: npm install && npm run build  # 「cd frontend &&」を削除
-    staticPublishPath: build  # 「frontend/」を削除
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
     envVars:
       - key: REACT_APP_API_URL
         value: https://btpkun-backend.onrender.com

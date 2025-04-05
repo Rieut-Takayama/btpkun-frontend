@@ -1,11 +1,9 @@
 services:
-  # バックエンドサービス
   - type: web
     name: btpkun-backend
     env: node
-    rootDir: backend  # backendディレクトリを指定
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production

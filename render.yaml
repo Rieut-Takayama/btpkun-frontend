@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
 
-  # フロントエンドサービス（静的サイトのプレースホルダー）
+  # フロントエンドサービス
   - type: static
     name: btpkun
     buildCommand: echo "Building static placeholder"

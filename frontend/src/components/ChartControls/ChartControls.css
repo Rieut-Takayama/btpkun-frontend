@@ -1,0 +1,105 @@
+.chart-controls {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: var(--text-color);
+}
+
+.timeframe-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px 5px;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.timeframe-button {
+  background-color: var(--bg-color-light);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.timeframe-button:hover {
+  background-color: var(--primary-color-dark);
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
+.timeframe-button.active {
+  background-color: var(--primary-color);
+  color: var(--bg-color);
+  box-shadow: 0 0 12px var(--primary-color);
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  background-color: rgba(10, 14, 23, 0.7);
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+
+.chart-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 0 20px;
+  color: var(--text-color-faded);
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 14, 23, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: var(--primary-color);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(75, 0, 130, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 20px;
+  color: var(--error-color);
+  text-align: center;
+}

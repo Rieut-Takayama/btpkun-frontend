@@ -1,4 +1,4 @@
-// ã‚·ã‚°ãƒŠãƒ«æ¤œå‡ºãƒ­ã‚¸ãƒƒã‚¯
+// ƒVƒOƒiƒ‹ŒŸoƒƒWƒbƒN
 import {
   calculateBollingerBands,
   calculateRSI,
@@ -8,43 +8,43 @@ import {
 } from './indicators';
 
 /**
- * ã‚·ã‚°ãƒŠãƒ«â‘ : ä»•è¾¼ã¿ãƒ•ã‚§ãƒ¼ã‚ºæ¤œå‡ºï¼ˆå‡ºæ¥é«˜å¢—åŠ Ã—ãƒ­ãƒ¼ã‚½ã‚¯æ¨ªã°ã„ï¼‰
- * @param {Array} prices - çµ‚å€¤ã®é…åˆ—
- * @param {Array} volumes - å‡ºæ¥é«˜ã®é…åˆ—
- * @returns {Object} æ¤œå‡ºçµæœï¼ˆdetected: æ¤œå‡ºã•ã‚ŒãŸã‹, strength: å¼·åº¦0-100, message: èª¬æ˜ï¼‰
+ * ƒVƒOƒiƒ‹‡@: ”ƒ‚¢‚İƒtƒF[ƒYŒŸoio—ˆ‚‘‰Á‚Æƒ[ƒ\ƒN‰¡‚Î‚¢j
+ * @param {Array} prices - I’l‚Ì”z—ñ
+ * @param {Array} volumes - o—ˆ‚‚Ì”z—ñ
+ * @returns {Object} ŒŸoŒ‹‰Ê {detected: ŒŸo‚³‚ê‚½‚©, strength: ‹­“x0-100, message: à–¾}
  */
 export const detectAccumulationPhase = (prices, volumes) => {
-  // å‡ºæ¥é«˜ã®å¤‰å‹•ã‚’è¨ˆç®—ï¼ˆæœŸé–“5ï¼‰
+  // o—ˆ‚‚Ì•Ï“®‚ğŒvZiŠúŠÔF5j
   const volumeChanges = calculateVolumeChange(volumes, 5);
-  
-  // ä¾¡æ ¼ã®å®‰å®šæ€§ã‚’è¨ˆç®—ï¼ˆæœŸé–“5ï¼‰
+
+  // ‰¿Ši‚ÌˆÀ’è«‚ğŒvZiŠúŠÔF5j
   const priceStability = calculatePriceStability(prices, 5);
-  
-  // æœ€æ–°ã®ãƒ‡ãƒ¼ã‚¿ã‚’ä½¿ç”¨
+
+  // ÅV‚Ìƒf[ƒ^‚ğg—p
   const lastIndex = prices.length - 1;
   const lastVolumeChange = volumeChanges[lastIndex];
   const lastPriceStability = priceStability[lastIndex];
-  
-  // ä»•è¾¼ã¿ãƒ•ã‚§ãƒ¼ã‚ºã®æ¡ä»¶ï¼š
-  // 1. å‡ºæ¥é«˜ãŒ30%ä»¥ä¸Šå¢—åŠ 
-  // 2. ä¾¡æ ¼ã®å®‰å®šæ€§ãŒ70ä»¥ä¸Šï¼ˆååˆ†ã«æ¨ªã°ã„ï¼‰
+
+  // ”ƒ‚¢‚İƒtƒF[ƒY‚ÌğŒF
+  // 1. o—ˆ‚‚ª30%ˆÈã‘‰Á
+  // 2. ‰¿Ši‚ÌˆÀ’è«‚ª70ˆÈãi\•ª‚É‰¡‚Î‚¢j
   let detected = false;
   let strength = 0;
   let message = '';
-  
+
   if (lastVolumeChange >= 30 && lastPriceStability >= 70) {
     detected = true;
-    
-    // å¼·åº¦ã®è¨ˆç®—: å‡ºæ¥é«˜å¢—åŠ ç‡ã¨ä¾¡æ ¼å®‰å®šæ€§ã‹ã‚‰ç®—å‡º
-    // å‡ºæ¥é«˜å¢—åŠ  30%â†’0ç‚¹ã€100%â†’50ç‚¹
-    // ä¾¡æ ¼å®‰å®šæ€§ 70â†’0ç‚¹ã€100â†’50ç‚¹
+
+    // ‹­“x‚ÌŒvZ
+    // o—ˆ‚‘‰Á 30%¨0“_A100%¨50“_
+    // ‰¿ŠiˆÀ’è« 70¨0“_A100¨50“_
     const volumeScore = Math.min(50, (lastVolumeChange - 30) * (50 / 70));
     const stabilityScore = Math.min(50, (lastPriceStability - 70) * (50 / 30));
-    
+
     strength = Math.round(volumeScore + stabilityScore);
-    message = `å‡ºæ¥é«˜${lastVolumeChange.toFixed(1)}%å¢—åŠ ã€ä¾¡æ ¼ã®æ¨ªã°ã„åº¦${lastPriceStability.toFixed(1)}`;
+    message = "o—ˆ‚" + lastVolumeChange.toFixed(1) + "%‘‰ÁA‰¿Ši‚Ì‰¡‚Î‚¢“x" + lastPriceStability.toFixed(1);
   }
-  
+
   return {
     type: 'ACCUMULATION_PHASE',
     detected,
@@ -54,54 +54,54 @@ export const detectAccumulationPhase = (prices, volumes) => {
 };
 
 /**
- * ã‚·ã‚°ãƒŠãƒ«â‘¡: Vå­—åç™ºæ¤œå‡ºï¼ˆRSI+MACDï¼‰
- * @param {Array} prices - çµ‚å€¤ã®é…åˆ—
- * @returns {Object} æ¤œå‡ºçµæœï¼ˆdetected: æ¤œå‡ºã•ã‚ŒãŸã‹, strength: å¼·åº¦0-100, message: èª¬æ˜ï¼‰
+ * ƒVƒOƒiƒ‹‡A: Vš‰ñ•œŒŸoiRSI+MACDj
+ * @param {Array} prices - I’l‚Ì”z—ñ
+ * @returns {Object} ŒŸoŒ‹‰Ê {detected: ŒŸo‚³‚ê‚½‚©, strength: ‹­“x0-100, message: à–¾}
  */
 export const detectVReversal = (prices) => {
-  // RSIè¨ˆç®—ï¼ˆæœŸé–“14ï¼‰
+  // RSIŒvZiŠúŠÔF14j
   const rsiValues = calculateRSI(prices, 14);
-  
-  // MACDè¨ˆç®—
+
+  // MACDŒvZ
   const macdResult = calculateMACD(prices);
-  
-  // æœ€æ–°ã®å€¤ã¨1ã¤å‰ã€2ã¤å‰ã®å€¤ã‚’ä½¿ç”¨
+
+  // ÅVA1‚Â‘OA2‚Â‘O‚Ì’l‚ğg—p
   const lastIndex = rsiValues.length - 1;
   const last = rsiValues[lastIndex];
   const previous = rsiValues[lastIndex - 1];
   const beforePrevious = rsiValues[lastIndex - 2];
-  
-  // MACDãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ã®æœ€æ–°ã¨1ã¤å‰ã®å€¤
+
+  // MACDƒqƒXƒgƒOƒ‰ƒ€‚ÌÅV‚Æ1‚Â‘O‚Ì’l
   const lastHistIndex = macdResult.histogram.length - 1;
   const lastHist = macdResult.histogram[lastHistIndex];
   const prevHist = macdResult.histogram[lastHistIndex - 1];
-  
-  // Vå­—åç™ºã®æ¡ä»¶ï¼š
-  // 1. RSIãŒå‰ã€…å›â†’å‰å›ã§æ¸›å°‘ã—ã€å‰å›â†’ä»Šå›ã§å¢—åŠ ï¼ˆåº•ã‚’æ‰“ã£ãŸï¼‰
-  // 2. æœ€æ–°ã®RSIãŒ30ä»¥ä¸‹ï¼ˆè²·ã‚ã‚Œéãé ˜åŸŸï¼‰ã‹ã‚‰å›å¾©å‚¾å‘
-  // 3. MACDãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ ãŒãƒã‚¤ãƒŠã‚¹ã‹ã‚‰ãƒ—ãƒ©ã‚¹ã«è»¢æ›ã€ã¾ãŸã¯ä¸‹ã’æ­¢ã¾ã‚Š
-  
+
+  // Vš‰ñ•œ‚ÌğŒF
+  // 1. RSI‚ª‘OX‰ñ¨‘O‰ñ‚ÅŒ¸­‚µA‘O‰ñ¨¡‰ñ‚Å‘‰Ái’ê‚ğ‘Å‚Á‚½j
+  // 2. ÅV‚ÌRSI‚ª30ˆÈ‰ºi”„‚ç‚ê‰ß‚¬—Ìˆæj‚©‚ç‰ñ•œŒXŒü
+  // 3. MACDƒqƒXƒgƒOƒ‰ƒ€‚ªƒ}ƒCƒiƒX‚©‚çƒvƒ‰ƒX‚É“]Š·A‚Ü‚½‚Í‰º‚°~‚Ü‚è
+
   let detected = false;
   let strength = 0;
   let message = '';
-  
+
   const rsiBottomed = beforePrevious > previous && previous < last;
   const rsiOversold = previous <= 30;
   const macdImproving = prevHist < lastHist;
-  
+
   if (rsiBottomed && rsiOversold && macdImproving) {
     detected = true;
-    
-    // å¼·åº¦ã®è¨ˆç®—:
-    // RSIã®éå£²ã‚Šåº¦ 30â†’30ç‚¹ã€0â†’60ç‚¹
-    // MACDæ”¹å–„åº¦ 0â†’0ç‚¹ã€å¤§ãã„ã»ã©åŠ ç‚¹(æœ€å¤§40ç‚¹)
+
+    // ‹­“x‚ÌŒvZ
+    // RSI‚Ì”„‚ç‚ê‰ß‚¬“x 30¨30“_A0¨60“_
+    // MACD‰ü‘P“x ¬¨0“_A‘å¨40“_(Å‘å)
     const rsiScore = Math.min(60, 30 + (30 - previous));
     const macdScore = Math.min(40, Math.max(0, (lastHist - prevHist) * 1000));
-    
+
     strength = Math.round(rsiScore + macdScore);
-    message = `RSI: ${previous.toFixed(1)}â†’${last.toFixed(1)}ã«å›å¾©ã€MACDãƒ’ã‚¹ãƒˆã‚°ãƒ©ãƒ æ”¹å–„`;
+    message = "RSI: " + previous.toFixed(1) + "¨" + last.toFixed(1) + "‚É‰ñ•œAMACDƒqƒXƒgƒOƒ‰ƒ€‰ü‘P";
   }
-  
+
   return {
     type: 'V_REVERSAL',
     detected,
@@ -111,65 +111,65 @@ export const detectVReversal = (prices) => {
 };
 
 /**
- * ã‚·ã‚°ãƒŠãƒ«â‘¢: ãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰ä¸‹é™ãƒ–ãƒ¬ã‚¤ã‚¯æ¤œå‡º
- * @param {Array} prices - çµ‚å€¤ã®é…åˆ—
- * @param {Array} lows - å®‰å€¤ã®é…åˆ—
- * @returns {Object} æ¤œå‡ºçµæœï¼ˆdetected: æ¤œå‡ºã•ã‚ŒãŸã‹, strength: å¼·åº¦0-100, message: èª¬æ˜ï¼‰
+ * ƒVƒOƒiƒ‹‡B: ƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒh‰ºŒÀƒuƒŒƒCƒNŒŸo
+ * @param {Array} prices - I’l‚Ì”z—ñ
+ * @param {Array} lows - ˆÀ’l‚Ì”z—ñ
+ * @returns {Object} ŒŸoŒ‹‰Ê {detected: ŒŸo‚³‚ê‚½‚©, strength: ‹­“x0-100, message: à–¾}
  */
 export const detectBollingerBreakout = (prices, lows) => {
-  // ãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰è¨ˆç®—ï¼ˆæœŸé–“20ã€æ¨™æº–åå·®2ï¼‰
+  // ƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒhŒvZiŠúŠÔ20A•W€•Î·2j
   const bbands = calculateBollingerBands(prices, 20, 2);
-  
-  // æœ€æ–°ã¨1ã¤å‰ã€2ã¤å‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’ä½¿ç”¨
+
+  // ÅV‚Æ1‚Â‘OA2‚Â‘O‚Ìƒf[ƒ^‚ğg—p
   const lastIndex = prices.length - 1;
   const lastLower = bbands.lower[bbands.lower.length - 1];
   const lastPrice = prices[lastIndex];
   const lastLow = lows[lastIndex];
-  
+
   const prevLower = bbands.lower[bbands.lower.length - 2];
   const prevPrice = prices[lastIndex - 1];
   const prevLow = lows[lastIndex - 1];
-  
-  // ãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰ä¸‹é™ãƒ–ãƒ¬ã‚¤ã‚¯ã®æ¡ä»¶ï¼š
-  // 1. å‰å›ã¾ãŸã¯ä»Šå›ã®å®‰å€¤ãŒãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰ä¸‹é™ã‚’ä¸‹å›ã£ãŸ
-  // 2. çµ‚å€¤ãŒãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰ä¸‹é™ã‚ˆã‚Šä¸Šã«æˆ»ã£ã¦ã„ã‚‹ï¼ˆã¾ãŸã¯è¿‘ã¥ã„ã¦ã„ã‚‹ï¼‰
-  
+
+  // ƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒh‰ºŒÀƒuƒŒƒCƒN‚ÌğŒF
+  // 1. ‘O‰ñ‚Ü‚½‚Í¡‰ñ‚ÌˆÀ’l‚ªƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒh‰ºŒÀ‚ğ‰º‰ñ‚Á‚½
+  // 2. I’l‚ªƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒh‰ºŒÀ‚æ‚èã‚É–ß‚Á‚Ä‚¢‚éi‚Ü‚½‚ÍÚ‹ß‚µ‚Ä‚¢‚éj
+
   let detected = false;
   let strength = 0;
   let message = '';
-  
+
   const prevBroke = prevLow < prevLower;
   const currentBroke = lastLow < lastLower;
   const priceRecovering = lastPrice > lastLower || (lastPrice / lastLower > 0.99);
-  
+
   if ((prevBroke || currentBroke) && priceRecovering) {
     detected = true;
-    
-    // å¼·åº¦ã®è¨ˆç®—:
-    // ä¸‹é™å‰²ã‚Œã®åº¦åˆã„ï¼ˆä¸‹é™ã¨å®‰å€¤ã®ä¹–é›¢ç‡ï¼‰30ç‚¹
-    // çµ‚å€¤ã®å›å¾©åº¦ï¼ˆçµ‚å€¤ã¨ä¸‹é™ã®é–¢ä¿‚ï¼‰70ç‚¹
+
+    // ‹­“x‚ÌŒvZ
+    // ‰ºŒÀŠ„‚ê‚Ì“x‡‚¢i‰ºŒÀ‚ÆˆÀ’l‚Ì˜¨—£—¦j30“_
+    // I’l‚Ì‰ñ•œ“xiI’l‚Æ‰ºŒÀ‚ÌŠÖŒWj40“_
     let breakthroughScore = 0;
     if (currentBroke) {
-      // ä¸‹é™ã‚’ã©ã‚Œã ã‘å‰²ã£ãŸã‹ (0ã€œ5%ã§0ã€œ30ç‚¹)
+      // ‰ºŒÀ‚ğ‚Ç‚ê‚¾‚¯Š„‚Á‚½‚© (0`5%‚Å0`30“_)
       breakthroughScore = Math.min(30, (1 - (lastLow / lastLower)) * 600);
     } else if (prevBroke) {
       breakthroughScore = Math.min(30, (1 - (prevLow / prevLower)) * 600);
     }
-    
-    // çµ‚å€¤ã®å›å¾©åº¦
+
+    // I’l‚Ì‰ñ•œ“x
     let recoveryScore = 0;
     if (lastPrice > lastLower) {
-      // ä¸‹é™ã‚’ä¸Šå›ã£ãŸå ´åˆ (0ã€œ5%ä¸Šå›ã‚Šã§30ã€œ70ç‚¹)
+      // ‰ºŒÀ‚ğã‰ñ‚Á‚½ê‡(0`5%ã‰ñ‚è‚Å30`70“_)
       recoveryScore = 30 + Math.min(40, ((lastPrice / lastLower) - 1) * 800);
     } else {
-      // ã¾ã ä¸‹é™ä»¥ä¸‹ã®å ´åˆ (ä¸‹é™ã¨ã®ä¹–é›¢ãŒå°ã•ã„ã»ã©ç‚¹æ•°ãŒé«˜ã„ã€æœ€å¤§25ç‚¹)
+      // ‚Ü‚¾‰ºŒÀˆÈ‰º‚Ìê‡(‰ºŒÀ‚Æ‚Ì˜¨—£‚ª¬‚³‚¢‚Ù‚Ç“_”‚ª‚‚¢AÅ‘å25“_)
       recoveryScore = Math.min(25, (lastPrice / lastLower) * 100 - 75);
     }
-    
+
     strength = Math.round(breakthroughScore + recoveryScore);
-    message = 'ãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰ä¸‹é™ã‚’å‰²ã‚Šè¾¼ã¿å¾Œã€ä¾¡æ ¼ãŒå›å¾©å‚¾å‘';
+    message = 'ƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒh‰ºŒÀ‚ğŠ„‚è‚İŒãA‰¿Ši‚ª‰ñ•œŒXŒü';
   }
-  
+
   return {
     type: 'BB_BREAK',
     detected,
@@ -179,27 +179,27 @@ export const detectBollingerBreakout = (prices, lows) => {
 };
 
 /**
- * ç·åˆè²·ã„åº¦ã®è¨ˆç®—
- * @param {Array} signals - æ¤œå‡ºã•ã‚ŒãŸã‚·ã‚°ãƒŠãƒ«ã®é…åˆ—
- * @returns {number} ç·åˆè²·ã„åº¦ (0-100%)
+ * ‘‡”ƒ‚¢“x‚ÌŒvZ
+ * @param {Array} signals - ŒŸo‚³‚ê‚½ƒVƒOƒiƒ‹‚Ì”z—ñ
+ * @returns {number} ‘‡”ƒ‚¢“x (0-100%)
  */
 export const calculateTotalBuyScore = (signals) => {
   if (!signals || signals.length === 0) {
     return 0;
   }
-  
-  // å„ã‚·ã‚°ãƒŠãƒ«ã®å¼·åº¦ã‚’é›†è¨ˆ
+
+  // ŠeƒVƒOƒiƒ‹‚Ì‹­“x‚ğWŒv
   let totalStrength = 0;
   let maxPossibleStrength = 0;
-  
+
   signals.forEach(signal => {
     if (signal.detected) {
       totalStrength += signal.strength;
     }
-    // å„ã‚·ã‚°ãƒŠãƒ«ã‚¿ã‚¤ãƒ—ã®æœ€å¤§å¼·åº¦ã¯100
+    // ŠeƒVƒOƒiƒ‹ƒ^ƒCƒv‚ÌÅ‘å‹­“x‚Í100
     maxPossibleStrength += 100;
   });
-  
-  // ç·åˆè²·ã„åº¦ã‚’è¨ˆç®—ï¼ˆæœ€å¤§100%ï¼‰
+
+  // ‘‡”ƒ‚¢“x‚ğŒvZiÅ‘å100%j
   return Math.min(100, Math.round((totalStrength / maxPossibleStrength) * 100));
 };

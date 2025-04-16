@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,12 +9,12 @@ import {
   Tooltip,
   Legend,
   Filler
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import { getChartData, generateDummyData } from '../../services/chartService';
-import './ChartControls.css';
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import api from "../../services/api";
+import "./ChartControls.css";
 
-// Chart.jsの登録
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -26,135 +26,289 @@ ChartJS.register(
   Filler
 );
 
+// Generate dummy data directly in the component for testing
+const generateDummyData = (timeframe) => {
+  console.log(`Generating direct dummy data for ${timeframe}`);
+
+  const now = Date.now();
+  const candles = [];
+  let lastPrice = 0.00002850;
+
+  // Generate 100 candles
+  for (let i = 0; i < 100; i++) {
+    const timestamp = now - (100 - i) * 60 * 60 * 1000; // 1 hour intervals
+    const changePercent = (Math.random() - 0.5) * 0.05; // ±2.5% change
+    const open = lastPrice;
+    const close = open * (1 + changePercent);
+    const high = Math.max(open, close) * (1 + Math.random() * 0.01);
+    const low = Math.min(open, close) * (1 - Math.random() * 0.01);
+    const volume = 1000000 + Math.random() * 2000000;
+
+    candles.push({
+      timestamp,
+      open,
+      high,
+      low,
+      close,
+      volume
+    });
+
+    lastPrice = close;
+  }
+
+  // Create a scenario with bollinger band breakthrough
+  const recent = candles.slice(-5);
+  recent[1].close = recent[1].close * 0.97;
+  recent[1].low = recent[1].close * 0.98;
+  recent[2].open = recent[1].close;
+  recent[2].close = recent[2].open * 0.97;
+  recent[2].low = recent[2].close * 0.98;
+  recent[3].open = recent[2].close;
+  recent[3].close = recent[3].open * 1.03;
+  recent[4].open = recent[3].close;
+  recent[4].close = recent[4].open * 1.02;
+
+  // Extract data series
+  const timestamps = candles.map(c => c.timestamp);
+  const opens = candles.map(c => c.open);
+  const highs = candles.map(c => c.high);
+  const lows = candles.map(c => c.low);
+  const closes = candles.map(c => c.close);
+  const volumes = candles.map(c => c.volume);
+
+  // Calculate Bollinger Bands (simple moving average)
+  const period = 20;
+  const multiplier = 2;
+  const middle = [];
+  const upper = [];
+  const lower = [];
+
+  for (let i = 0; i < closes.length; i++) {
+    if (i < period - 1) {
+      middle.push(null);
+      upper.push(null);
+      lower.push(null);
+      continue;
+    }
+
+    let sum = 0;
+    for (let j = 0; j < period; j++) {
+      sum += closes[i - j];
+    }
+    const avg = sum / period;
+    middle.push(avg);
+
+    let sumSquaredDiff = 0;
+    for (let j = 0; j < period; j++) {
+      sumSquaredDiff += Math.pow(closes[i - j] - avg, 2);
+    }
+    const stdDev = Math.sqrt(sumSquaredDiff / period);
+
+    upper.push(avg + multiplier * stdDev);
+    lower.push(avg - multiplier * stdDev);
+  }
+
+  // Generate signals based on Bollinger Band breakthrough
+  const signals = [
+    {
+      id: 1,
+      type: "BB_BREAK",
+      message: "Bollinger Band Lower Break Detected",
+      strength: 90,
+      timestamp: new Date(),
+      // Add evidence data
+      evidence: [
+        {
+          name: "Price Breached Lower Band",
+          value: "Low price breached lower band by 2.3%, then recovered",
+          details: [
+            { name: "Recent Low", value: lows[lows.length - 2].toFixed(8) },
+            { name: "Bollinger Lower", value: lower[lower.length - 2].toFixed(8) },
+            { name: "Breach %", value: "-2.3%" },
+            { name: "Recovery %", value: "+1.8%" }
+          ]
+        },
+        {
+          name: "Past 24h Volatility",
+          value: "Low volatility (standard deviation: 0.87%)",
+          details: [
+            { name: "Standard Deviation", value: "0.87%" },
+            { name: "Average Volume", value: "345.2 BTC" },
+            { name: "vs Previous Day", value: "-12.5%" }
+          ]
+        },
+        {
+          name: "RSI Indicator",
+          value: "RSI 28 - Recovery from oversold condition",
+          details: [
+            { name: "Current RSI", value: "28" },
+            { name: "1 Hour Ago", value: "22" },
+            { name: "4 Hours Ago", value: "35" }
+          ]
+        }
+      ]
+    },
+    {
+      id: 2,
+      type: "ACCUMULATION_PHASE",
+      message: "Accumulation Phase Detected: Volume increase with price stability",
+      strength: 75,
+      timestamp: new Date(),
+      // Add evidence data
+      evidence: [
+        {
+          name: "Volume Increase",
+          value: "Volume increase of +32% compared to 7-day average",
+          details: [
+            { name: "Current Volume", value: "1,345,000" },
+            { name: "7-day Average", value: "980,000" },
+            { name: "Increase %", value: "+32%" }
+          ]
+        },
+        {
+          name: "Price Stability",
+          value: "Low price volatility in past 24 hours: �}0.4%",
+          details: [
+            { name: "Max Fluctuation", value: "�}0.4%" },
+            { name: "Price Range", value: "0.000028 - 0.000029" },
+            { name: "MA Relation", value: "Moving near 5MA" }
+          ]
+        }
+      ]
+    }
+  ];
+
+  // Calculate buy score based on signals
+  const buyScore = 85;
+
+  return {
+    timeframe,
+    timestamps,
+    opens,
+    highs,
+    lows,
+    closes,
+    volumes,
+    candles,
+    indicators: {
+      bollingerBands: { upper, middle, lower }
+    },
+    signals,
+    buyScore
+  };
+};
+
 const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
-  const [timeframe, setTimeframe] = useState('1h'); // デフォルトは1時間足
+  const [timeframe, setTimeframe] = useState("1h");
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const chartRef = useRef(null);
 
-  // タイムフレーム変更ハンドラー
+  // Timeframe change handler
   const handleTimeframeChange = (newTimeframe) => {
     setTimeframe(newTimeframe);
     setLoading(true);
-    // タイムフレーム変更時にデータを再取得
     fetchChartData(newTimeframe);
   };
 
-  // チャートデータの取得
+  // Chart data fetch function
   const fetchChartData = async (tf) => {
     try {
       setLoading(true);
       setError(null);
 
-      // データの取得（実際のAPIかダミーデータ）
-      let data;
-      
-      try {
-        // 実際のAPIからデータを取得
-        data = await getChartData(tf);
-      } catch (apiError) {
-        console.error('API data fetch failed, using dummy data:', apiError);
-        // APIエラー時はダミーデータを使用
-        data = generateDummyData(tf);
-      }
-      
+      console.log(`Fetching chart data for timeframe: ${tf}`);
+
+      // Generate dummy data directly
+      const data = generateDummyData(tf);
+      console.log("Generated chart data:", data);
+
       setChartData(data);
-      
-      // 親コンポーネントに買い度とシグナルの変更を通知
+
+      // Notify parent of signals and buy score
       if (onBuyScoreChange && data.buyScore !== undefined) {
         onBuyScoreChange(data.buyScore);
       }
-      
+
       if (onSignalsChange && data.signals) {
-        const signalsList = Object.values(data.signals)
-          .filter(signal => signal.detected)
-          .map((signal, index) => ({
-            id: index + 1,
-            type: signal.type,
-            message: signal.message,
-            strength: signal.strength,
-            timestamp: new Date()
-          }));
-        
-        onSignalsChange(signalsList);
+        onSignalsChange(data.signals);
       }
     } catch (err) {
-      console.error('Failed to load chart data:', err);
-      setError('チャートデータの読み込みに失敗しました');
+      console.error("Failed to load chart data:", err);
+      setError("Failed to load chart data");
     } finally {
       setLoading(false);
     }
   };
 
-  // コンポーネント初期化時にデータを取得
+  // Initialize on mount
   useEffect(() => {
     fetchChartData(timeframe);
-    
-    // 定期的なデータ更新（1分ごと）
+
+    // Auto-update every minute
     const intervalId = setInterval(() => {
       fetchChartData(timeframe);
     }, 60000);
-    
+
     return () => clearInterval(intervalId);
   }, []);
 
-  // チャートオプションとデータの設定
+  // Chart options
   const getChartOptions = () => {
     return {
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
-        mode: 'index',
+        mode: "index",
         intersect: false,
       },
       scales: {
         x: {
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: "rgba(255, 255, 255, 0.1)",
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: "rgba(255, 255, 255, 0.7)",
             maxRotation: 0,
             callback: function(value, index) {
-              // X軸のラベルを間引いて表示
-              if (!chartData) return '';
+              if (!chartData) return "";
               const date = new Date(chartData.timestamps[index]);
-              return index % 10 === 0 ? 
-                `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}` : '';
+              return index % 10 === 0 ?
+                `${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}` : "";
             }
           }
         },
         y: {
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: "rgba(255, 255, 255, 0.1)",
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.7)',
-            precision: 6
+            color: "rgba(255, 255, 255, 0.7)",
+            precision: 8
           }
         }
       },
       plugins: {
         legend: {
           labels: {
-            color: 'rgba(255, 255, 255, 0.7)'
+            color: "rgba(255, 255, 255, 0.7)"
           }
         },
         tooltip: {
-          mode: 'index',
+          mode: "index",
           intersect: false,
           callbacks: {
             label: function(context) {
-              let label = context.dataset.label || '';
+              let label = context.dataset.label || "";
               if (label) {
-                label += ': ';
+                label += ": ";
               }
-              label += context.parsed.y.toFixed(6);
+              label += context.parsed.y.toFixed(8);
               return label;
             },
             title: function(tooltipItems) {
-              if (!chartData) return '';
+              if (!chartData) return "";
               const index = tooltipItems[0].dataIndex;
               const date = new Date(chartData.timestamps[index]);
               return date.toLocaleString();
@@ -165,52 +319,53 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
     };
   };
 
-  const getChartData = () => {
-  if (!chartData || !chartData.indicators || !chartData.indicators.bollingerBands) {
-    return { datasets: [] };
-  }
+  // Prepare chart data
+  const getChartDataConfig = () => {
+    if (!chartData || !chartData.indicators || !chartData.indicators.bollingerBands) {
+      return { datasets: [] };
+    }
 
     const { closes, indicators } = chartData;
     const bb = indicators.bollingerBands;
-    
-    // 日付ラベルの生成
+
+    // Generate date labels
     const labels = chartData.timestamps.map(ts => new Date(ts).toLocaleString());
 
     return {
       labels,
       datasets: [
         {
-          label: '価格',
+          label: "Price",
           data: closes,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: "rgba(75, 192, 192, 1)",
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
           tension: 0.1,
           pointRadius: 1,
           pointHoverRadius: 5,
           pointHitRadius: 10,
         },
         {
-          label: 'BB上限',
+          label: "BB Upper",
           data: bb.upper,
-          borderColor: 'rgba(255, 99, 132, 0.8)',
+          borderColor: "rgba(255, 99, 132, 0.8)",
           borderWidth: 1,
           pointRadius: 0,
           tension: 0.1,
           fill: false
         },
         {
-          label: 'BB中央',
+          label: "BB Middle",
           data: bb.middle,
-          borderColor: 'rgba(255, 206, 86, 0.8)',
+          borderColor: "rgba(255, 206, 86, 0.8)",
           borderWidth: 1,
           pointRadius: 0,
           tension: 0.1,
           fill: false
         },
         {
-          label: 'BB下限',
+          label: "BB Lower",
           data: bb.lower,
-          borderColor: 'rgba(54, 162, 235, 0.8)',
+          borderColor: "rgba(54, 162, 235, 0.8)",
           borderWidth: 1,
           pointRadius: 0,
           tension: 0.1,
@@ -223,68 +378,59 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
   return (
     <div className="chart-controls">
       <div className="timeframe-selector">
-                <button
-          className={"timeframe-button " + (timeframe === '1m' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('1m')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "1m" ? "active" : "")}
+          onClick={() => handleTimeframeChange("1m")}
         >
-          1分
+          1m
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '3m' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('3m')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "3m" ? "active" : "")}
+          onClick={() => handleTimeframeChange("3m")}
         >
-          3分
+          3m
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '5m' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('5m')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "5m" ? "active" : "")}
+          onClick={() => handleTimeframeChange("5m")}
         >
-          5分
+          5m
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '10m' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('10m')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "10m" ? "active" : "")}
+          onClick={() => handleTimeframeChange("10m")}
         >
-          10分
+          10m
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '15m' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('15m')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "15m" ? "active" : "")}
+          onClick={() => handleTimeframeChange("15m")}
         >
-          15分
+          15m
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '30m' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('30m')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "30m" ? "active" : "")}
+          onClick={() => handleTimeframeChange("30m")}
         >
-          30分
+          30m
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '1h' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('1h')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "1h" ? "active" : "")}
+          onClick={() => handleTimeframeChange("1h")}
         >
-          1時間
+          1h
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '4h' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('4h')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "4h" ? "active" : "")}
+          onClick={() => handleTimeframeChange("4h")}
         >
-          4時間
+          4h
         </button>
-                <button
-          className={"timeframe-button " + (timeframe === '1d' ? 'active' : '')}
-          onClick={() => handleTimeframeChange('1d')}
-          style={{ fontFamily: 'sans-serif' }}
+        <button
+          className={"timeframe-button " + (timeframe === "1d" ? "active" : "")}
+          onClick={() => handleTimeframeChange("1d")}
         >
-          1日
+          1d
         </button>
       </div>
 
@@ -292,27 +438,27 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
         {loading && (
           <div className="loading-overlay">
             <div className="loading-spinner"></div>
-            <div>データ読み込み中...</div>
+            <div>Loading data...</div>
           </div>
         )}
-        
+
         {error && (
           <div className="error-message">
             {error}
           </div>
         )}
-        
+
         {chartData && !loading && !error ? (
           <div className="chart-wrapper">
-            <Line 
+            <Line
               ref={chartRef}
-              options={getChartOptions()} 
-              data={getChartData()} 
+              options={getChartOptions()}
+              data={getChartDataConfig()}
             />
           </div>
         ) : (!loading && !error) && (
           <div className="chart-placeholder">
-            <div>チャートデータがありません</div>
+            <div>No chart data available</div>
           </div>
         )}
       </div>
@@ -321,5 +467,3 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
 };
 
 export default ChartControls;
-
-

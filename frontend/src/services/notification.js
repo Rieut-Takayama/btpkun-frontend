@@ -1,8 +1,8 @@
-ï»¿import api from './api';
+import api from './api';
 
-// é€šçŸ¥ã‚µãƒ¼ãƒ“ã‚¹ï¼ˆç°¡ç•¥ç‰ˆï¼‰
+// ’Ê’mƒT[ƒrƒXiŠÈ—ª”Åj
 const notificationService = {
-  // é€šçŸ¥è¨­å®šã‚’å–å¾—
+  // ’Ê’mÝ’è‚ðŽæ“¾
   async getSettings() {
     try {
       const response = await api.get(api.endpoints.notificationSettings);
@@ -12,8 +12,8 @@ const notificationService = {
       throw error;
     }
   },
-  
-  // é€šçŸ¥è¨­å®šã‚’æ›´æ–°
+
+  // ’Ê’mÝ’è‚ðXV
   async updateSettings(settings) {
     try {
       const response = await api.put(api.endpoints.notificationSettings, settings);
@@ -23,8 +23,8 @@ const notificationService = {
       throw error;
     }
   },
-  
-  // é€šçŸ¥å±¥æ­´ã‚’å–å¾—
+
+  // ’Ê’m—š—ð‚ðŽæ“¾
   async getNotifications(limit = 10) {
     try {
       const response = await api.get(api.endpoints.notifications, { limit });
@@ -34,32 +34,32 @@ const notificationService = {
       throw error;
     }
   },
-  
-  // é€šçŸ¥ã‚’æ—¢èª­ã«ã™ã‚‹
+
+  // ’Ê’m‚ðŠù“Ç‚É‚·‚é
   async markAsRead(notificationId) {
     try {
-      const response = await api.put(${api.endpoints.notifications}//read);
+      const response = await api.put(`${api.endpoints.notifications}/read`);
       return response;
     } catch (error) {
       console.error('Mark notification as read error:', error);
       throw error;
     }
   },
-  
-  // ãƒ–ãƒ©ã‚¦ã‚¶é€šçŸ¥ã‚’è¡¨ç¤ºï¼ˆPWAæ©Ÿèƒ½ï¼‰
+
+  // ƒuƒ‰ƒEƒU’Ê’m‚ð•\Ž¦iPWA‹@”\j
   showBrowserNotification(title, options = {}) {
-    // ãƒ–ãƒ©ã‚¦ã‚¶é€šçŸ¥APIã®ã‚µãƒãƒ¼ãƒˆãƒã‚§ãƒƒã‚¯
+    // ƒuƒ‰ƒEƒU’Ê’mAPI‚ÌƒTƒ|[ƒgƒ`ƒFƒbƒN
     if (!('Notification' in window)) {
       console.warn('This browser does not support desktop notifications');
       return;
     }
-    
-    // é€šçŸ¥ã®è¨±å¯çŠ¶æ…‹ã‚’ãƒã‚§ãƒƒã‚¯
+
+    // ’Ê’m‚Ì‹–‰Âó‘Ô‚ðƒ`ƒFƒbƒN
     if (Notification.permission === 'granted') {
-      // é€šçŸ¥ã‚’è¡¨ç¤º
+      // ’Ê’m‚ð•\Ž¦
       new Notification(title, options);
     } else if (Notification.permission !== 'denied') {
-      // è¨±å¯ã‚’æ±‚ã‚ã‚‹
+      // ‹–‰Â‚ð‹‚ß‚é
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
           new Notification(title, options);

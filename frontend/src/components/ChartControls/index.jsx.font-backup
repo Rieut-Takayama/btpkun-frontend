@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+ï»¿import React, { useState, useEffect, useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +14,7 @@ import { Line } from 'react-chartjs-2';
 import { getChartData, generateDummyData } from '../../services/chartService';
 import './ChartControls.css';
 
-// Chart.js‚Ì“o˜^
+// Chart.jsã®ç™»éŒ²
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,41 +27,41 @@ ChartJS.register(
 );
 
 const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
-  const [timeframe, setTimeframe] = useState('1h'); // ƒfƒtƒHƒ‹ƒg‚Í1ŽžŠÔ‘«
+  const [timeframe, setTimeframe] = useState('1h'); // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯1æ™‚é–“è¶³
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const chartRef = useRef(null);
 
-  // ƒ^ƒCƒ€ƒtƒŒ[ƒ€•ÏXƒnƒ“ƒhƒ‰[
+  // ã‚¿ã‚¤ãƒ ãƒ•ãƒ¬ãƒ¼ãƒ å¤‰æ›´ãƒãƒ³ãƒ‰ãƒ©ãƒ¼
   const handleTimeframeChange = (newTimeframe) => {
     setTimeframe(newTimeframe);
     setLoading(true);
-    // ƒ^ƒCƒ€ƒtƒŒ[ƒ€•ÏXŽž‚Éƒf[ƒ^‚ðÄŽæ“¾
+    // ã‚¿ã‚¤ãƒ ãƒ•ãƒ¬ãƒ¼ãƒ å¤‰æ›´æ™‚ã«ãƒ‡ãƒ¼ã‚¿ã‚’å†å–å¾—
     fetchChartData(newTimeframe);
   };
 
-  // ƒ`ƒƒ[ƒgƒf[ƒ^‚ÌŽæ“¾
+  // ãƒãƒ£ãƒ¼ãƒˆãƒ‡ãƒ¼ã‚¿ã®å–å¾—
   const fetchChartData = async (tf) => {
     try {
       setLoading(true);
       setError(null);
 
-      // ƒf[ƒ^‚ÌŽæ“¾iŽÀÛ‚ÌAPI‚©ƒ_ƒ~[ƒf[ƒ^j
+      // ãƒ‡ãƒ¼ã‚¿ã®å–å¾—ï¼ˆå®Ÿéš›ã®APIã‹ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ï¼‰
       let data;
       
       try {
-        // ŽÀÛ‚ÌAPI‚©‚çƒf[ƒ^‚ðŽæ“¾
+        // å®Ÿéš›ã®APIã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
         data = await getChartData(tf);
       } catch (apiError) {
         console.error('API data fetch failed, using dummy data:', apiError);
-        // APIƒGƒ‰[Žž‚Íƒ_ƒ~[ƒf[ƒ^‚ðŽg—p
+        // APIã‚¨ãƒ©ãƒ¼æ™‚ã¯ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’ä½¿ç”¨
         data = generateDummyData(tf);
       }
       
       setChartData(data);
       
-      // eƒRƒ“ƒ|[ƒlƒ“ƒg‚É”ƒ‚¢“x‚ÆƒVƒOƒiƒ‹‚Ì•ÏX‚ð’Ê’m
+      // è¦ªã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã«è²·ã„åº¦ã¨ã‚·ã‚°ãƒŠãƒ«ã®å¤‰æ›´ã‚’é€šçŸ¥
       if (onBuyScoreChange && data.buyScore !== undefined) {
         onBuyScoreChange(data.buyScore);
       }
@@ -81,17 +81,17 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
       }
     } catch (err) {
       console.error('Failed to load chart data:', err);
-      setError('ƒ`ƒƒ[ƒgƒf[ƒ^‚Ì“Ç‚Ýž‚Ý‚ÉŽ¸”s‚µ‚Ü‚µ‚½');
+      setError('ãƒãƒ£ãƒ¼ãƒˆãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸ');
     } finally {
       setLoading(false);
     }
   };
 
-  // ƒRƒ“ƒ|[ƒlƒ“ƒg‰Šú‰»Žž‚Éƒf[ƒ^‚ðŽæ“¾
+  // ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆåˆæœŸåŒ–æ™‚ã«ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
   useEffect(() => {
     fetchChartData(timeframe);
     
-    // ’èŠú“I‚Èƒf[ƒ^XVi1•ª‚²‚Æj
+    // å®šæœŸçš„ãªãƒ‡ãƒ¼ã‚¿æ›´æ–°ï¼ˆ1åˆ†ã”ã¨ï¼‰
     const intervalId = setInterval(() => {
       fetchChartData(timeframe);
     }, 60000);
@@ -99,7 +99,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // ƒ`ƒƒ[ƒgƒIƒvƒVƒ‡ƒ“‚Æƒf[ƒ^‚ÌÝ’è
+  // ãƒãƒ£ãƒ¼ãƒˆã‚ªãƒ—ã‚·ãƒ§ãƒ³ã¨ãƒ‡ãƒ¼ã‚¿ã®è¨­å®š
   const getChartOptions = () => {
     return {
       responsive: true,
@@ -117,7 +117,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
             color: 'rgba(255, 255, 255, 0.7)',
             maxRotation: 0,
             callback: function(value, index) {
-              // XŽ²‚Ìƒ‰ƒxƒ‹‚ðŠÔˆø‚¢‚Ä•\Ž¦
+              // Xè»¸ã®ãƒ©ãƒ™ãƒ«ã‚’é–“å¼•ã„ã¦è¡¨ç¤º
               if (!chartData) return '';
               const date = new Date(chartData.timestamps[index]);
               return index % 10 === 0 ? 
@@ -173,14 +173,14 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
     const { closes, indicators } = chartData;
     const bb = indicators.bollingerBands;
     
-    // “ú•tƒ‰ƒxƒ‹‚Ì¶¬
+    // æ—¥ä»˜ãƒ©ãƒ™ãƒ«ã®ç”Ÿæˆ
     const labels = chartData.timestamps.map(ts => new Date(ts).toLocaleString());
 
     return {
       labels,
       datasets: [
         {
-          label: '‰¿Ši',
+          label: 'ä¾¡æ ¼',
           data: closes,
           borderColor: 'rgba(75, 192, 192, 1)',
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -190,7 +190,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
           pointHitRadius: 10,
         },
         {
-          label: 'BBãŒÀ',
+          label: 'BBä¸Šé™',
           data: bb.upper,
           borderColor: 'rgba(255, 99, 132, 0.8)',
           borderWidth: 1,
@@ -199,7 +199,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
           fill: false
         },
         {
-          label: 'BB’†‰›',
+          label: 'BBä¸­å¤®',
           data: bb.middle,
           borderColor: 'rgba(255, 206, 86, 0.8)',
           borderWidth: 1,
@@ -208,7 +208,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
           fill: false
         },
         {
-          label: 'BB‰ºŒÀ',
+          label: 'BBä¸‹é™',
           data: bb.lower,
           borderColor: 'rgba(54, 162, 235, 0.8)',
           borderWidth: 1,
@@ -223,59 +223,68 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
   return (
     <div className="chart-controls">
       <div className="timeframe-selector">
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '1m' ? 'active' : '')}
           onClick={() => handleTimeframeChange('1m')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          1•ª
+          1åˆ†
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '3m' ? 'active' : '')}
           onClick={() => handleTimeframeChange('3m')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          3•ª
+          3åˆ†
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '5m' ? 'active' : '')}
           onClick={() => handleTimeframeChange('5m')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          5•ª
+          5åˆ†
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '10m' ? 'active' : '')}
           onClick={() => handleTimeframeChange('10m')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          10•ª
+          10åˆ†
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '15m' ? 'active' : '')}
           onClick={() => handleTimeframeChange('15m')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          15•ª
+          15åˆ†
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '30m' ? 'active' : '')}
           onClick={() => handleTimeframeChange('30m')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          30•ª
+          30åˆ†
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '1h' ? 'active' : '')}
           onClick={() => handleTimeframeChange('1h')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          1ŽžŠÔ
+          1æ™‚é–“
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '4h' ? 'active' : '')}
           onClick={() => handleTimeframeChange('4h')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          4ŽžŠÔ
+          4æ™‚é–“
         </button>
-        <button
+                <button
           className={"timeframe-button " + (timeframe === '1d' ? 'active' : '')}
           onClick={() => handleTimeframeChange('1d')}
+          style={{ fontFamily: 'sans-serif' }}
         >
-          1“ú
+          1æ—¥
         </button>
       </div>
 
@@ -283,7 +292,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
         {loading && (
           <div className="loading-overlay">
             <div className="loading-spinner"></div>
-            <div>ƒf[ƒ^“Ç‚Ýž‚Ý’†...</div>
+            <div>ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿ä¸­...</div>
           </div>
         )}
         
@@ -303,7 +312,7 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
           </div>
         ) : (!loading && !error) && (
           <div className="chart-placeholder">
-            <div>ƒ`ƒƒ[ƒgƒf[ƒ^‚ª‚ ‚è‚Ü‚¹‚ñ</div>
+            <div>ãƒãƒ£ãƒ¼ãƒˆãƒ‡ãƒ¼ã‚¿ãŒã‚ã‚Šã¾ã›ã‚“</div>
           </div>
         )}
       </div>
@@ -312,3 +321,5 @@ const ChartControls = ({ onBuyScoreChange, onSignalsChange }) => {
 };
 
 export default ChartControls;
+
+

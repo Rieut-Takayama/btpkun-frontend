@@ -655,3 +655,85 @@
     margin-left: 16px;
   }
 }
+/* シグナル根拠表示用のスタイル */
+.signal-more-info {
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.signal-evidence {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 12px;
+  border-left: 3px solid var(--primary-color);
+  animation: fadeIn 0.3s ease;
+}
+
+.signal-evidence h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.evidence-item {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.evidence-item:last-child {
+  border-bottom: none;
+}
+
+.evidence-name {
+  font-weight: bold;
+  color: var(--info-color);
+  margin-bottom: 3px;
+}
+
+.evidence-value {
+  color: var(--text-color);
+  margin-bottom: 6px;
+}
+
+.evidence-details {
+  background-color: rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.evidence-details h5 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--text-color-faded);
+}
+
+.evidence-details ul {
+  margin: 0;
+  padding-left: 15px;
+}
+
+.evidence-details li {
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.detail-name {
+  color: var(--text-color-faded);
+}
+
+.detail-value {
+  color: var(--success-color);
+  margin-left: 4px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

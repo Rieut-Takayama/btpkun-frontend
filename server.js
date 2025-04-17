@@ -1,38 +1,42 @@
-const express = require("express");
+ï»¿const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const crypto = require("crypto");
+const path = require("path");  // pathãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’è¿½åŠ 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// CORSİ’è‚ÆJSONƒp[ƒT[
+// CORSè¨­å®šã¨JSONãƒ‘ãƒ¼ã‚µãƒ¼
 app.use(cors());
 app.use(express.json());
 
-// ƒƒOƒ~ƒhƒ‹ƒEƒFƒA
+// ãƒ­ã‚°ãƒŸãƒ‰ãƒ«ã‚¦ã‚§ã‚¢
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
 
-// ƒƒ‚ƒŠ“à‚ÉAPIİ’è‚ğ•Û‘¶
+// ãƒ¡ãƒ¢ãƒªå†…ã«APIè¨­å®šã‚’ä¿å­˜
 let apiConfig = null;
 
-// ƒXƒe[ƒ^ƒXƒGƒ“ƒhƒ|ƒCƒ“ƒg
+// ãƒ•ãƒ­ãƒ³ãƒˆã‚¨ãƒ³ãƒ‰ã®ãƒ“ãƒ«ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æä¾›
+app.use(express.static('build'));
+
+// ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚¨ãƒ³ãƒ‰ãƒã‚¤ãƒ³ãƒˆ
 app.get("/api/status", (req, res) => {
   res.json({ status: "OK", message: "BTP-kun backend is running" });
 });
 
-// APIİ’èæ“¾
+// APIè¨­å®šå–å¾—
 app.get("/api/config", (req, res) => {
   if (!apiConfig) {
     return res.status(404).json({ message: "API configuration not found" });
   }
-  // APIƒV[ƒNƒŒƒbƒg‚Í•Ô‚³‚È‚¢
+  // APIã‚·ãƒ¼ã‚¯ãƒ¬ãƒƒãƒˆã¯è¿”ã•ãªã„
   res.json({ apiKey: apiConfig.apiKey });
 });
 
-// APIİ’è•Û‘¶
+// APIè¨­å®šä¿å­˜
 app.post("/api/config", (req, res) => {
   const { apiKey, apiSecret } = req.body;
 
@@ -40,13 +44,13 @@ app.post("/api/config", (req, res) => {
     return res.status(400).json({ message: "API key and secret are required" });
   }
 
-  // ƒƒ‚ƒŠ‚É•Û‘¶
+  // ãƒ¡ãƒ¢ãƒªã«ä¿å­˜
   apiConfig = { apiKey, apiSecret };
 
   res.json({ message: "API configuration saved successfully" });
 });
 
-// MEXC API‚Ö‚ÌƒŠƒNƒGƒXƒg¶¬ŠÖ”
+// MEXC APIã¸ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆç”Ÿæˆé–¢æ•°
 async function mexcRequest(endpoint, params = {}, method = "GET") {
   if (!apiConfig) {
     throw new Error("API configuration not found");
@@ -55,23 +59,23 @@ async function mexcRequest(endpoint, params = {}, method = "GET") {
   const baseUrl = "https://api.mexc.com";
   const url = baseUrl + endpoint;
 
-  // ƒŠƒNƒGƒXƒgƒwƒbƒ_[
+  // ãƒªã‚¯ã‚¨ã‚¹ãƒˆãƒ˜ãƒƒãƒ€ãƒ¼
   const headers = {
     "Content-Type": "application/json",
     "X-MEXC-APIKEY": apiConfig.apiKey
   };
 
-  // ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv‚ÆƒVƒOƒlƒ`ƒƒ‚Ì’Ç‰Ái”FØ‚ª•K—v‚Èê‡j
+  // ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—ã¨ã‚·ã‚°ãƒãƒãƒ£ã®è¿½åŠ ï¼ˆèªè¨¼ãŒå¿…è¦ãªå ´åˆï¼‰
   if (endpoint.startsWith("/api/v3")) {
     params.timestamp = Date.now();
 
-    // ƒpƒ‰ƒ[ƒ^‚ğƒNƒGƒŠ•¶š—ñ‚É•ÏŠ·
+    // ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ã‚¯ã‚¨ãƒªæ–‡å­—åˆ—ã«å¤‰æ›
     const queryString = Object.keys(params)
       .sort()
       .map(key => `${key}=${params[key]}`)
       .join("&");
 
-    // ƒVƒOƒlƒ`ƒƒ‚Ì¶¬
+    // ã‚·ã‚°ãƒãƒãƒ£ã®ç”Ÿæˆ
     const signature = crypto.createHmac("sha256", apiConfig.apiSecret).update(queryString).digest("hex");
     params.signature = signature;
   }
@@ -91,7 +95,7 @@ async function mexcRequest(endpoint, params = {}, method = "GET") {
   }
 }
 
-// APIÚ‘±ƒeƒXƒg
+// APIæ¥ç¶šãƒ†ã‚¹ãƒˆ
 app.post("/api/config/test", async (req, res) => {
   const { apiKey, apiSecret } = req.body;
 
@@ -99,23 +103,23 @@ app.post("/api/config/test", async (req, res) => {
     return res.status(400).json({ message: "API key and secret are required" });
   }
 
-  // ˆê“I‚ÉAPIİ’è‚ğ•Û‘¶
+  // ä¸€æ™‚çš„ã«APIè¨­å®šã‚’ä¿å­˜
   const tempConfig = { apiKey, apiSecret };
 
   try {
-    // ƒeƒXƒg—p‚ÉƒAƒJƒEƒ“ƒgî•ñ‚ğæ“¾
+    // ãƒ†ã‚¹ãƒˆç”¨ã«ã‚¢ã‚«ã‚¦ãƒ³ãƒˆæƒ…å ±ã‚’å–å¾—
     const originalConfig = apiConfig;
     apiConfig = tempConfig;
 
     try {
-      // Š·Zî•ñAPI‚Í”FØ‚ª•s—v‚È‚Ì‚ÅƒeƒXƒg—p‚Ég—p
+      // æ›ç®—æƒ…å ±APIã¯èªè¨¼ãŒä¸è¦ãªã®ã§ãƒ†ã‚¹ãƒˆç”¨ã«ä½¿ç”¨
       const testData = await axios.get("https://api.mexc.com/api/v3/ticker/24hr", {
         params: { symbol: "OKMUSDT" },
         headers: { "X-MEXC-APIKEY": apiKey }
       });
 
       if (testData.status === 200) {
-        // ƒeƒXƒg¬Œ÷‚Éİ’è‚ğ•Û‘¶
+        // ãƒ†ã‚¹ãƒˆæˆåŠŸæ™‚ã«è¨­å®šã‚’ä¿å­˜
         apiConfig = tempConfig;
         res.json({ message: "API connection successful", data: testData.data });
       } else {
@@ -134,14 +138,14 @@ app.post("/api/config/test", async (req, res) => {
   }
 });
 
-// sêƒf[ƒ^æ“¾
+// å¸‚å ´ãƒ‡ãƒ¼ã‚¿å–å¾—
 app.get("/api/market", async (req, res) => {
   try {
     let marketData;
 
     if (apiConfig) {
       try {
-        // MEXC API‚©‚çsêƒf[ƒ^‚ğæ“¾
+        // MEXC APIã‹ã‚‰å¸‚å ´ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
         const response = await axios.get("https://api.mexc.com/api/v3/ticker/24hr", {
           params: { symbol: "OKMUSDT" }
         });
@@ -159,11 +163,11 @@ app.get("/api/market", async (req, res) => {
         };
       } catch (error) {
         console.error("Error fetching market data from MEXC:", error);
-        // APIƒGƒ‰[‚Íƒ_ƒ~[ƒf[ƒ^g—p
+        // APIã‚¨ãƒ©ãƒ¼æ™‚ã¯ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ä½¿ç”¨
         marketData = getDummyMarketData();
       }
     } else {
-      // APIİ’è‚ª‚È‚¢ê‡‚Íƒ_ƒ~[ƒf[ƒ^
+      // APIè¨­å®šãŒãªã„å ´åˆã¯ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿
       marketData = getDummyMarketData();
     }
 
@@ -174,18 +178,18 @@ app.get("/api/market", async (req, res) => {
   }
 });
 
-// ƒ`ƒƒ[ƒgƒf[ƒ^æ“¾
+// ãƒãƒ£ãƒ¼ãƒˆãƒ‡ãƒ¼ã‚¿å–å¾—
 app.get("/api/chart", async (req, res) => {
   try {
     const interval = req.query.interval || "hourly";
     const limit = parseInt(req.query.limit) || 100;
 
-    // MEXC‚ÌƒCƒ“ƒ^[ƒoƒ‹Œ`®‚É•ÏŠ·
+    // MEXCã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«å½¢å¼ã«å¤‰æ›
     const mexcIntervalMap = {
       "oneMin": "1m",
       "threeMin": "3m",
       "fiveMin": "5m",
-      "tenMin": "15m", // MEXC‚É10•ª‚ª‚È‚¢‚Ì‚Å15•ª‚ğ‘ã—p
+      "tenMin": "15m", // MEXCã«10åˆ†ãŒãªã„ã®ã§15åˆ†ã‚’ä»£ç”¨
       "fifteenMin": "15m",
       "thirtyMin": "30m",
       "hourly": "1h",
@@ -199,7 +203,7 @@ app.get("/api/chart", async (req, res) => {
 
     if (apiConfig) {
       try {
-        // MEXC API‚©‚çƒ[ƒ\ƒN‘«ƒf[ƒ^‚ğæ“¾
+        // MEXC APIã‹ã‚‰ãƒ­ãƒ¼ã‚½ã‚¯è¶³ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
         const response = await axios.get("https://api.mexc.com/api/v3/klines", {
           params: {
             symbol: "OKMUSDT",
@@ -208,8 +212,8 @@ app.get("/api/chart", async (req, res) => {
           }
         });
 
-        // MEXC‚ÌƒŒƒXƒ|ƒ“ƒXƒtƒH[ƒ}ƒbƒg:
-        // [ŠJnŠÔ, n’l, ‚’l, ˆÀ’l, I’l, o—ˆ‚, I—¹ŠÔ, ...]
+        // MEXCã®ãƒ¬ã‚¹ãƒãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ:
+        // [é–‹å§‹æ™‚é–“, å§‹å€¤, é«˜å€¤, å®‰å€¤, çµ‚å€¤, å‡ºæ¥é«˜, çµ‚äº†æ™‚é–“, ...]
         candles = response.data.map(item => ({
           timestamp: parseInt(item[0]),
           open: parseFloat(item[1]),
@@ -220,11 +224,11 @@ app.get("/api/chart", async (req, res) => {
         }));
       } catch (error) {
         console.error("Error fetching chart data from MEXC:", error);
-        // APIƒGƒ‰[‚Íƒ_ƒ~[ƒf[ƒ^g—p
+        // APIã‚¨ãƒ©ãƒ¼æ™‚ã¯ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿ä½¿ç”¨
         candles = generateDummyCandles(limit);
       }
     } else {
-      // APIİ’è‚ª‚È‚¢ê‡‚Íƒ_ƒ~[ƒf[ƒ^
+      // APIè¨­å®šãŒãªã„å ´åˆã¯ãƒ€ãƒŸãƒ¼ãƒ‡ãƒ¼ã‚¿
       candles = generateDummyCandles(limit);
     }
 
@@ -235,7 +239,7 @@ app.get("/api/chart", async (req, res) => {
   }
 });
 
-// ƒ_ƒ~[sêƒf[ƒ^¶¬
+// ãƒ€ãƒŸãƒ¼å¸‚å ´ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ
 function getDummyMarketData() {
   return {
     symbol: "OKM/USDT",
@@ -248,7 +252,7 @@ function getDummyMarketData() {
   };
 }
 
-// ƒ_ƒ~[ƒ[ƒ\ƒN‘«ƒf[ƒ^¶¬
+// ãƒ€ãƒŸãƒ¼ãƒ­ãƒ¼ã‚½ã‚¯è¶³ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ
 function generateDummyCandles(limit) {
   const now = Date.now();
   const candles = [];
@@ -256,7 +260,7 @@ function generateDummyCandles(limit) {
   let lastClose = basePrice;
 
   for (let i = 0; i < limit; i++) {
-    const timestamp = now - (limit - i) * 60 * 60 * 1000; // 1ŠÔŠÔŠu
+    const timestamp = now - (limit - i) * 60 * 60 * 1000; // 1æ™‚é–“é–“éš”
 
     const volatility = 0.005;
     const changePercent = (Math.random() - 0.5) * volatility;
@@ -268,7 +272,7 @@ function generateDummyCandles(limit) {
     const low = Math.min(open, close) - (Math.random() * open * 0.002);
 
     const volume = 1000000 + Math.random() * 1000000;
-    
+
     candles.push({
       timestamp,
       open,
@@ -281,7 +285,7 @@ function generateDummyCandles(limit) {
     lastClose = close;
   }
 
-  // ƒ{ƒŠƒ“ƒWƒƒ[ƒoƒ“ƒh‰ºŒÀƒuƒŒƒCƒN‚ÌƒVƒiƒŠƒI‚ğ’Ç‰Á
+  // ãƒœãƒªãƒ³ã‚¸ãƒ£ãƒ¼ãƒãƒ³ãƒ‰ä¸‹é™ãƒ–ãƒ¬ã‚¤ã‚¯ã®ã‚·ãƒŠãƒªã‚ªã‚’è¿½åŠ 
   const recent = candles.slice(-5);
   recent[1].close = recent[1].close * 0.98;
   recent[1].low = recent[1].close * 0.97;
@@ -303,8 +307,16 @@ function generateDummyCandles(limit) {
   return candles;
 }
 
-// ƒT[ƒo[‹N“®
+// ã™ã¹ã¦ã®ãƒ«ãƒ¼ãƒˆã§index.htmlã‚’è¿”ã™ï¼ˆSPAå¯¾å¿œï¼‰- APIãƒ«ãƒ¼ãƒˆã‚’é™¤ã
+app.get('*', (req, res) => {
+  // APIã‚¨ãƒ³ãƒ‰ãƒã‚¤ãƒ³ãƒˆã¯é™¤å¤–
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+// ã‚µãƒ¼ãƒãƒ¼èµ·å‹•
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-

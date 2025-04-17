@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 let apiConfig = null;
 
 // フロントエンドのビルドファイルを提供
-app.use(express.static("build"));
+app.use(express.static(path.join(__dirname, "build")));
 
 // ステータスエンドポイント
 app.get("/api/status", (req, res) => {
@@ -320,3 +320,4 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

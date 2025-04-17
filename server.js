@@ -2,7 +2,7 @@
 const cors = require("cors");
 const axios = require("axios");
 const crypto = require("crypto");
-const path = require("path");  // pathモジュールを追加
+const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 let apiConfig = null;
 
 // フロントエンドのビルドファイルを提供
-app.use(express.static('build'));
+app.use(express.static("build"));
 
 // ステータスエンドポイント
 app.get("/api/status", (req, res) => {
@@ -307,13 +307,13 @@ function generateDummyCandles(limit) {
   return candles;
 }
 
-// すべてのルートでindex.htmlを返す（SPA対応）- APIルートを除く
-app.get('*', (req, res) => {
-  // APIエンドポイントは除外
-  if (req.path.startsWith('/api/')) {
-    return next();
+// APIルート以外のすべてのリクエストでindex.htmlを返す（SPA対応）
+app.get("*", (req, res) => {
+  // APIエンドポイントは既に上で処理されているので、ここでは何もしない
+  if (req.path.startsWith("/api/")) {
+    return res.status(404).send("API endpoint not found");
   }
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 // サーバー起動

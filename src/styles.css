@@ -1,0 +1,280 @@
+﻿/* グローバルスタイル - サイバーパンク風UI (強化版) */
+:root {
+  --primary-bg: #0a0e17;
+  --secondary-bg: #1a1f2e;
+  --primary-color: #00aaff;
+  --primary-color-rgb: 0, 170, 255;
+  --secondary-color: #ff00aa;
+  --secondary-color-rgb: 255, 0, 170;
+  --accent-color: #aa00ff;
+  --accent-color-rgb: 170, 0, 255;
+  --text-color: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #2a3040;
+  --success-color: #00ff9d;
+  --warning-color: #ffaa00;
+  --error-color: #ff3e5b;
+  --glow-intensity: 0.6;
+  
+  /* ネオン発光効果 */
+  --primary-glow: 0 0 10px rgba(0, 170, 255, 0.7), 0 0 20px rgba(0, 170, 255, 0.4);
+  --secondary-glow: 0 0 10px rgba(255, 0, 170, 0.7), 0 0 20px rgba(255, 0, 170, 0.4);
+  --text-glow: 0 0 5px rgba(0, 170, 255, 0.7);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Rajdhani', 'Orbitron', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--primary-bg);
+  color: var(--text-color);
+  min-height: 100vh;
+  background-image: 
+    linear-gradient(135deg, rgba(26, 31, 46, 0.8) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(26, 31, 46, 0.8) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(26, 31, 46, 0.8) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(26, 31, 46, 0.8) 25%, var(--primary-bg) 25%);
+  background-position: 20px 0, 20px 0, 0 0, 0 0;
+  background-size: 40px 40px;
+  background-repeat: repeat;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.card {
+  background: rgba(26, 31, 46, 0.7);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(0, 170, 255, 0.2);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  animation: scanLine 3s linear infinite;
+}
+
+@keyframes scanLine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* サイバーパンクネオン効果 */
+.neon-text {
+  text-shadow: var(--text-glow);
+  animation: pulse 3s infinite alternate;
+}
+
+.neon-border {
+  position: relative;
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  box-shadow: var(--primary-glow);
+  animation: borderPulse 4s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { text-shadow: var(--text-glow); }
+  100% { text-shadow: 0 0 10px rgba(0, 170, 255, 0.9), 0 0 20px rgba(0, 170, 255, 0.6); }
+}
+
+@keyframes borderPulse {
+  0% { box-shadow: var(--primary-glow); }
+  100% { box-shadow: 0 0 15px rgba(0, 170, 255, 0.9), 0 0 30px rgba(0, 170, 255, 0.5); }
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  background-color: rgba(0, 170, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+}
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, var(--primary-color), #0080ff);
+  color: var(--primary-bg);
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(0, 170, 255, 0.7);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: rotate(45deg);
+  animation: btnGlow 2s linear infinite;
+}
+
+@keyframes btnGlow {
+  0% { transform: rotate(45deg) translateX(-100%); }
+  100% { transform: rotate(45deg) translateX(100%); }
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--primary-bg);
+  border-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-color);
+  opacity: 0.9;
+  box-shadow: 0 0 15px rgba(255, 0, 170, 0.7);
+}
+
+input, select, textarea {
+  background-color: rgba(26, 31, 46, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px 15px;
+  color: var(--text-color);
+  width: 100%;
+  font-family: 'Rajdhani', sans-serif;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 170, 255, 0.2);
+}
+
+/* タイトル強化 */
+h1, h2, h3 {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+h1::after, h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border-right: 2px solid var(--primary-color);
+  animation: typewriter 3s steps(40) infinite;
+}
+
+@keyframes typewriter {
+  0%, 100% { width: 0; }
+  50% { width: 5px; }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 1200px) {
+  .container {
+    padding: 0 10px;
+  }
+  
+  .card {
+    padding: 10px;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    background-size: 30px 30px;
+  }
+  
+  .card {
+    padding: 10px;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    font-size: 13px;
+    background-size: 20px 20px;
+  }
+  
+  .card {
+    padding: 8px;
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 375px) {
+  body {
+    font-size: 12px;
+  }
+}

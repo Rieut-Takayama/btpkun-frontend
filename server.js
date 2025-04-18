@@ -16,11 +16,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// 重要: 静的ファイルを最初に提供（順序が重要）
+app.use(express.static(path.join(__dirname, "build")));
+
 // メモリ内にAPI設定を保存
 let apiConfig = null;
-
-// フロントエンドのビルドファイルを提供
-app.use(express.static(path.join(__dirname, "build")));
 
 // ステータスエンドポイント
 app.get("/api/status", (req, res) => {
@@ -307,12 +307,8 @@ function generateDummyCandles(limit) {
   return candles;
 }
 
-// APIルート以外のすべてのリクエストでindex.htmlを返す（SPA対応）
+// その他のリクエストに対してindex.htmlを返す（最後に配置）
 app.get("*", (req, res) => {
-  // APIエンドポイントは既に上で処理されているので、ここでは何もしない
-  if (req.path.startsWith("/api/")) {
-    return res.status(404).send("API endpoint not found");
-  }
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
@@ -320,4 +316,3 @@ app.get("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
